@@ -2,5 +2,5 @@
 This is the repo for the course DD2443 where lab excersises.
 
 ## Authors
-Joakim Eriksson
+Joakim Eriksson, 
 Maximilian Auer
