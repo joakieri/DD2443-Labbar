@@ -20,12 +20,13 @@ class LogEntry {
 	}
 
 	static boolean checkLog(Collection<LogEntry> log) {
-		LogEntry[] arr = (LogEntry[])log.toArray();
+		try {
+		LogEntry[] arr = log.toArray(new LogEntry[log.size()]);
 		Arrays.sort(arr, new Comparator<LogEntry>() {
 			public int compare(LogEntry a, LogEntry b) {
-				return (int)a.time - (int)b.time;
+				return (int)(a.time - b.time);
 			}}); 
-		for (int i = arr.length-1; i >= 0; i--) {
+		for (int i = arr.length-1; i > 0; i--) {
 			LogEntry a = arr[i];
 			if (!a.result)
 				continue;
@@ -65,6 +66,10 @@ class LogEntry {
 				break;
 			default:
 			}
+		}
+		}
+		catch(Exception e) {
+			return false;
 		}
 		return true;
 	}

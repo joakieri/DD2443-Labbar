@@ -2,7 +2,7 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-class LCSLS6 {
+class LockfreeConcurrentSkipListSet {
 	final int maxLevel;
 	final Node head;
 	final Node tail;
@@ -10,7 +10,7 @@ class LCSLS6 {
 	private ArrayList<Integer> randLevelDist;
 	private ReentrantLock lock = new ReentrantLock();
 
-	public LCSLS6(int levels) {
+	public LockfreeConcurrentSkipListSet(int levels) {
 		maxLevel = levels - 1;
 		head = new Node(Integer.MIN_VALUE, levels);
 		tail = new Node(Integer.MAX_VALUE, levels);

@@ -2,7 +2,7 @@ import java.util.Random;
 import java.util.Collection;
 import java.util.ArrayList;
 
-class LCSLS10 {
+class LockfreeConcurrentSkipListSet {
 	final int maxLevel;
 	final Node head;
 	final Node tail;
@@ -10,7 +10,7 @@ class LCSLS10 {
 	private ArrayList<Integer> randLevelDist;
 	private Collection<LogEntry> log; 
 
-	public LCSLS10(int levels, Collection<LogEntry> log) {
+	public LockfreeConcurrentSkipListSet(int levels, Collection<LogEntry> log) {
 		maxLevel = levels - 1;
 		head = new Node(Integer.MIN_VALUE, levels);
 		tail = new Node(Integer.MAX_VALUE, levels);

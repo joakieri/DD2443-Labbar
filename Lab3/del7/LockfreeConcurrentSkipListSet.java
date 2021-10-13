@@ -3,7 +3,7 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.ArrayList;
 
-class LCSLS7 {
+class LockfreeConcurrentSkipListSet {
 	final int maxLevel;
 	final Node head;
 	final Node tail;
@@ -12,7 +12,7 @@ class LCSLS7 {
 	private ReentrantLock lock = new ReentrantLock();
 	private Collection<LogEntry> log; 
 
-	public LCSLS7(int levels, Collection<LogEntry> log) {
+	public LockfreeConcurrentSkipListSet(int levels, Collection<LogEntry> log) {
 		maxLevel = levels - 1;
 		head = new Node(Integer.MIN_VALUE, levels);
 		tail = new Node(Integer.MAX_VALUE, levels);

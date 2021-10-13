@@ -1,23 +1,21 @@
 import java.util.Random;
-import java.util.Collection;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.ArrayList;
 
-class LCSLS9 {
+class LockfreeConcurrentSkipListSet {
 	final int maxLevel;
 	final Node head;
 	final Node tail;
-	private Random rand = new Random();
+	private Random rand;
 	private ArrayList<Integer> randLevelDist;
-	private Collection<LogEntry>[] log; 
 
-	public LCSLS9(int levels, Collection<LogEntry>[] log) {
+	public LockfreeConcurrentSkipListSet(int levels) {
 		maxLevel = levels - 1;
 		head = new Node(Integer.MIN_VALUE, levels);
 		tail = new Node(Integer.MAX_VALUE, levels);
 		for (int i = 0; i < levels; i++)
 			head.next[i].set(tail, false);
 
+		rand = new Random();
 		randLevelDist = new ArrayList();		
 		int n = ((int)Math.pow(2, maxLevel));
 		int m = 1;		
@@ -27,7 +25,6 @@ class LCSLS9 {
 			m++;
 			n /= 2;
 		}
-		this.log = log;
 	}
 
 	private int getRandLevel() {
@@ -35,7 +32,7 @@ class LCSLS9 {
 		return randLevelDist.get(i).intValue();
 	}
 
-	public boolean contains(int num, int id) {	
+	public boolean contains(int num) {	
 		boolean[] marked = { false };
 		boolean changed;
 		Node prev = null, curr = null, next = null;
@@ -58,10 +55,8 @@ class LCSLS9 {
 					break;
 			}
 		}
-		long t = System.nanoTime(); //LIN. POINT
-		boolean r = curr.num == num;
-		log[id].add(new LogEntry(t, LogEntry.CONTAINS, num, r));
-		return r;
+		System.out.println(System.nanoTime()); //LIN. POINT
+		return curr.num == num;
 	}
 
 	public boolean find(int num, Node[] preds, Node[] succs) {
@@ -100,7 +95,7 @@ class LCSLS9 {
 		}
 	}
 
-	public boolean add(int num, int id) {
+	public boolean add(int num) {
 		int levels = getRandLevel();
 		Node[] preds = new Node[maxLevel + 1];
 		Node[] succs = new Node[maxLevel + 1];
@@ -110,7 +105,7 @@ class LCSLS9 {
 			boolean found = find(num, preds, succs);
 			sample = System.nanoTime();
 			if (found) { // LIN. POINT
-				log[id].add(new LogEntry(sample, LogEntry.ADD, num, false));
+				System.out.println(sample);
 				return false;
 			}
 			else {
@@ -123,9 +118,9 @@ class LCSLS9 {
 				Node prev = preds[0];
 				Node next = succs[0];
 				sample = System.nanoTime();
-				boolean r = prev.next[0].compareAndSet(next, newNode, false, false); // LIN. POINT	
+				boolean r = prev.next[0].compareAndSet(next, newNode, false, false); // LIN. POINT
 				if (r)
-					log[id].add(new LogEntry(sample, LogEntry.ADD, num, true));
+					System.out.println(sample);
 				else
 					continue;
 
@@ -144,7 +139,7 @@ class LCSLS9 {
 		}
 	}
 
-	public boolean remove(int num, int id) {
+	public boolean remove(int num) {
 		Node[] preds = new Node[maxLevel + 1];
 		Node[] succs = new Node[maxLevel + 1];
 		Node next;
@@ -153,10 +148,10 @@ class LCSLS9 {
 		long sample;
 		
 		while (true) { 
-			boolean found = find(num, preds, succs);
+			boolean found = find(num, preds, succs);	
 			sample = System.nanoTime();
-			if (!found) { // LIN. POINT	
-				log[id].add(new LogEntry(sample, LogEntry.REMOVE, num, false));
+			if (!found) { // LIN. POINT
+				System.out.println(sample);
 				return false;
 			}
 			else {
@@ -167,7 +162,7 @@ class LCSLS9 {
 						sample = System.nanoTime();
 						boolean r = nodeToRemove.next[level].compareAndSet(next, next, false, true); // LIN. POINT
 						if (!linearized && r) {
-							log[id].add(new LogEntry(sample, LogEntry.REMOVE, num, true));
+							System.out.println(sample);
 							linearized = true;
 						}
 						next = nodeToRemove.next[level].get(marked);
@@ -175,23 +170,21 @@ class LCSLS9 {
 				}
 			
 				next = nodeToRemove.next[0].get(marked);
-				while (true) {
+				while (true) { 
 					sample = System.nanoTime();
 					boolean iMarkedIt = nodeToRemove.next[0].compareAndSet(next, next, false, true); // LIN. POINT
 					if (!linearized && iMarkedIt) {
-						log[id].add(new LogEntry(sample, LogEntry.REMOVE, num, true));
+						System.out.println(System.nanoTime());
 						linearized = true;
 					}
-
+					next = succs[0].next[0].get(marked);
+					sample = System.nanoTime();
 					if (iMarkedIt) {
 						find(num, preds, succs);
 						return true;
 					}
-					
-					next = succs[0].next[0].get(marked);
-					sample = System.nanoTime();
-					if (!iMarkedIt && marked[0]) { // LIN. POINT
-						log[id].add(new LogEntry(sample, LogEntry.REMOVE, num, false));
+					else if (marked[0]) { // LIN. POINT
+						System.out.println(sample);
 						return false;
 					}
 				}
