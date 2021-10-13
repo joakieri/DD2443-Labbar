@@ -76,11 +76,9 @@ class Part5 {
 		t2.start();
 		t1.start();
 
-		/*
 		for (;;) {
 			System.out.println(t1.getState() + " " + t2.getState());
 			try {Thread.sleep(500);} catch(Exception e) {}
-		}
-		*/	
+		}	
 	}
 }

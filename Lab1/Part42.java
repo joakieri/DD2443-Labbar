@@ -12,8 +12,8 @@ class Part42 implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		Thread[] threads = new Thread[20];
-		for (int i = 0; i < 20; i++) {
+		Thread[] threads = new Thread[10];
+		for (int i = 0; i < 10; i++) {
 			threads[i] = new Thread(new Part42());
 			threads[i].start();	
 		}

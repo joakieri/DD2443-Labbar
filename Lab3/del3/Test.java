@@ -2,17 +2,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 
-public class Assignment3 {
+public class Test {
     public static void main(String[] args) {
-        int exponent = 7;
+        int exponent = 2; //7
         int listSize = (int)Math.pow(10, exponent);
         Populate pop = new Populate();
         pop.generateBoth(listSize);
         pop.printMeanStd();
-        LockfreeConcurrentSkipListSet skiplistUniform = new LockfreeConcurrentSkipListSet(25);
-        LockfreeConcurrentSkipListSet skiplistNormal = new LockfreeConcurrentSkipListSet(25);
+	LCSLS3 skiplistUniform = new LCSLS3(25);
+        LCSLS3 skiplistNormal = new LCSLS3(25);
         int[] uniformRandom = pop.getUniformRandom();
         int[] normalRandom = pop.getNormalRandom();
 
@@ -26,7 +27,7 @@ public class Assignment3 {
         }
         System.out.println("Done populating skiplists!");
 
-        int threadOption = 0;
+        int threadOption = 1;
         int ratioOption = 0;
         int testSize = (int)Math.pow(10, exponent-1);
         double[][] ratioArr = {{0.5, 0.5, 0.0}, {0.25, 0.25, 0.50}, {0.05, 0.05, 0.90}};
@@ -66,10 +67,10 @@ public class Assignment3 {
 class ThreadTest implements Runnable {
     static AtomicInteger activeThreads = new AtomicInteger();
     int[] instructions, randArr;
-    LockfreeConcurrentSkipListSet skiplist;
+    LCSLS3 skiplist;
 
 
-    public ThreadTest(LockfreeConcurrentSkipListSet skiplist, int[] randArr, int[] instructions) {
+    public ThreadTest(LCSLS3 skiplist, int[] randArr, int[] instructions) {
         this.instructions = instructions;
         this.skiplist = skiplist;
         this.randArr = randArr;

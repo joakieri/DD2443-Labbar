@@ -1,14 +1,14 @@
 import java.util.Random;
 import java.util.ArrayList;
 
-class LockfreeConcurrentSkipListSet {
+class LCSLS2 {
 	final int maxLevel;
 	final Node head;
 	final Node tail;
 	private Random rand;
 	private ArrayList<Integer> randLevelDist;
 
-	public LockfreeConcurrentSkipListSet(int levels) {
+	public LCSLS2(int levels) {
 		maxLevel = levels - 1;
 		head = new Node(Integer.MIN_VALUE, levels);
 		tail = new Node(Integer.MAX_VALUE, levels);
@@ -55,6 +55,7 @@ class LockfreeConcurrentSkipListSet {
 					break;
 			}
 		}
+		System.out.println(System.nanoTime()); //LIN. POINT
 		return curr.num == num;
 	}
 
@@ -98,11 +99,15 @@ class LockfreeConcurrentSkipListSet {
 		int levels = getRandLevel();
 		Node[] preds = new Node[maxLevel + 1];
 		Node[] succs = new Node[maxLevel + 1];
+		long sample;
 
 		while (true) {
 			boolean found = find(num, preds, succs);
-			if (found) // LIN. POINT
+			sample = System.nanoTime();
+			if (found) { // LIN. POINT
+				System.out.println(sample);
 				return false;
+			}
 			else {
 				Node newNode = new Node(num, levels);
 				for (int level = 0; level < levels; level++) {
@@ -112,8 +117,11 @@ class LockfreeConcurrentSkipListSet {
 				
 				Node prev = preds[0];
 				Node next = succs[0];
+				sample = System.nanoTime();
 				boolean r = prev.next[0].compareAndSet(next, newNode, false, false); // LIN. POINT
-				if (!r)
+				if (r)
+					System.out.println(sample);
+				else
 					continue;
 
 				for (int level = 1; level < levels; level++) {
@@ -136,10 +144,14 @@ class LockfreeConcurrentSkipListSet {
 		Node[] succs = new Node[maxLevel + 1];
 		Node next;
 		boolean[] marked = { false };
+		boolean linearized = false;
+		long sample;
 		
 		while (true) { 
 			boolean found = find(num, preds, succs);	
+			sample = System.nanoTime();
 			if (!found) { // LIN. POINT
+				System.out.println(sample);
 				return false;
 			}
 			else {
@@ -147,21 +159,34 @@ class LockfreeConcurrentSkipListSet {
 				for (int level = nodeToRemove.next.length-1; level >= 1; level--) {
 					next = nodeToRemove.next[level].get(marked);
 					while (!marked[0]) {
-						nodeToRemove.next[level].compareAndSet(next, next, false, true); // LIN. POINT
+						sample = System.nanoTime();
+						boolean r = nodeToRemove.next[level].compareAndSet(next, next, false, true); // LIN. POINT
+						if (!linearized && r) {
+							System.out.println(sample);
+							linearized = true;
+						}
 						next = nodeToRemove.next[level].get(marked);
 					}
 				}
 			
 				next = nodeToRemove.next[0].get(marked);
 				while (true) { 
+					sample = System.nanoTime();
 					boolean iMarkedIt = nodeToRemove.next[0].compareAndSet(next, next, false, true); // LIN. POINT
+					if (!linearized && iMarkedIt) {
+						System.out.println(System.nanoTime());
+						linearized = true;
+					}
 					next = succs[0].next[0].get(marked);
+					sample = System.nanoTime();
 					if (iMarkedIt) {
 						find(num, preds, succs);
 						return true;
 					}
-					else if (marked[0]) // LIN. POINT
+					else if (marked[0]) { // LIN. POINT
+						System.out.println(sample);
 						return false;
+					}
 				}
 			}
 		}

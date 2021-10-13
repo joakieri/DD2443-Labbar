@@ -1,4 +1,4 @@
-import java.util.HashMap;
+//import java.util.HashMap;
 
 class Part2 {
 	public static void main(String[] args) {
@@ -9,14 +9,14 @@ class Part2 {
 			threads[i] = new MyThread();
 			threads[i].start();
 		}
-/*
+
 		boolean con;
 		do {
 			con = false;
 			for (int i = 0; i < n; i++)
 				con = con || threads[i].isAlive();
 		} while(con);
-*/
+
 		System.out.println(MyThread.getVal());
 	}
 }

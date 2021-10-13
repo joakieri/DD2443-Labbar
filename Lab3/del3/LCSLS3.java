@@ -1,14 +1,14 @@
 import java.util.Random;
 import java.util.ArrayList;
 
-class LockfreeConcurrentSkipListSet {
+class LCSLS3 {
 	final int maxLevel;
 	final Node head;
 	final Node tail;
 	private Random rand;
 	private ArrayList<Integer> randLevelDist;
 
-	public LockfreeConcurrentSkipListSet(int levels) {
+	public LCSLS3(int levels) {
 		maxLevel = levels - 1;
 		head = new Node(Integer.MIN_VALUE, levels);
 		tail = new Node(Integer.MAX_VALUE, levels);
